@@ -1,79 +1,25 @@
 // Create web server
 
-// Import express
+// Import Express
 const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const { v4: uuidv4 } = require('uuid');
+const router = express.Router();
 
-// Create web server
-const app = express();
+// Import models
+const Comment = require('../models/Comment');
 
-// Use body-parser
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Use cors
-app.use(cors());
-
-// Create data
-let comments = [
-  {
-    id: uuidv4(),
-    name: 'John',
-    comment: 'Hello',
-  },
-  {
-    id: uuidv4(),
-    name: 'Kevin',
-    comment: 'Hi',
-  },
-];
-
+// Create routes
 // Get all comments
-app.get('/comments', (req, res) => {
-  res.json(comments);
+router.get('/', (req, res) => {
+    Comment.find()
+        .then(comments => res.json(comments))
+        .catch(err => res.status(400).json(`Error: ${err}`));
 });
 
 // Get comment by id
-app.get('/comments/:id', (req, res) => {
-  const id = req.params.id;
-  const comment = comments.find((comment) => comment.id === id);
-  res.json(comment);
+router.get('/:id', (req, res) => {
+    Comment.findById(req.params.id)
+        .then(comment => res.json(comment))
+        .catch(err => res.status(400).json(`Error: ${err}`));
 });
 
-// Create comment
-app.post('/comments', (req, res) => {
-  const comment = {
-    id: uuidv4(),
-    name: req.body.name,
-    comment: req.body.comment,
-  };
-  comments.push(comment);
-  res.json(comment);
-});
-
-// Update comment
-app.put('/comments/:id', (req, res) => {
-  const id = req.params.id;
-  let comment = comments.find((comment) => comment.id === id);
-  comment.name = req.body.name;
-  comment.comment = req.body.comment;
-  res.json(comment);
-});
-
-// Delete comment
-app.delete('/comments/:id', (req, res) => {
-  const id = req.params.id;
-  comments = comments.filter((comment) => comment.id !== id);
-  res.json(comments);
-});
-
-// Start web server
-app.listen(3000, () => {
-  console.log('Web server running on port 3000');
-});// Import modules
-
-const express = require('express');
-const router = express.Router();
 
